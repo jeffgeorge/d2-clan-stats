@@ -1,0 +1,4 @@
+<?php
+
+$config['apikey'] = '';
+$config['client_id'] = '';
