@@ -53,7 +53,8 @@ $authed_username = $current_user['destinyMemberships'][0]['displayName'];
 $destiny_membership_type = $current_user['destinyMemberships'][0]['membershipType'];
 $destiny_membership_id = $current_user['destinyMemberships'][0]['membershipId'];
 
-echo "<p>Authenticated As: $authed_username</p>";
+echo "<h2>Authenticated As</h2>";
+echo "<p>Username: $authed_username</p>";
 echo "<p>Destiny Membership ID: $destiny_membership_id</p>";
 //var_dump($current_user);
 
@@ -107,14 +108,63 @@ $clan_rewards_info = curl_getinfo($ch);
 curl_close($ch);
 
 if ($clan_rewards_result['ErrorCode'] == 1){
-  $clan_rewards = $clan_rewards_result['Response']['rewards'][0]['entries'];
+  $current_clan_rewards = $clan_rewards_result['Response']['rewards'][0]['entries'];
+  $past_clan_rewards = $clan_rewards_result['Response']['rewards'][1]['entries'];
 }
 else {
   die("Clan Rewards Lookup Error");
 }
 
-foreach($clan_rewards as $reward){
-  echo "<p>Welfare Engram #".$reward['rewardEntryHash']." Earned: ". ($reward['earned']?"Yes":"No")."</p>";
+echo "<h2>This Week's Welfare</h2>";
+foreach($current_clan_rewards as $reward){
+  if (!empty($hashes[$reward['rewardEntryHash']])){
+    echo "<p>".$hashes[$reward['rewardEntryHash']].": ". ($reward['earned']?"Earned":"Not Yet")."</p>";
+  }
+  else {
+    echo "<p>Welfare Engram #".$reward['rewardEntryHash'].": ". ($reward['earned']?"Earned":"Not Yet")."</p>";
+  }
+}
+
+echo "<h2>Last Week's Welfare</h2>";
+foreach($past_clan_rewards as $reward){
+  if (!empty($hashes[$reward['rewardEntryHash']])){
+    echo "<p>".$hashes[$reward['rewardEntryHash']].": ". ($reward['earned']?"Yes":"No")."</p>";
+  }
+  else {
+    echo "<p>Welfare Engram #".$reward['rewardEntryHash'].": ". ($reward['earned']?"Yes":"No")."</p>";
+  }
 }
 
 //var_dump($clan_rewards);
+
+//var_dump($clan_rewards_result);
+/*
+// Get Clan Members
+$ch = curl_init();
+curl_setopt_array($ch, $default_options);
+curl_setopt_array($ch, array(
+  CURLOPT_URL => API_URI."/GroupV2/".$linked_clan['groupId']."/Members/?currentpage=1",
+));
+$clan_result = json_decode(curl_exec($ch), TRUE);
+$clan_info = curl_getinfo($ch);
+curl_close($ch);
+
+if ($clan_result['ErrorCode'] == 1){
+  $clan = $clan_result['Response']['results'];
+}
+else {
+  die("Clan Lookup Error");
+}
+//var_dump($clan);
+$members = array();
+
+foreach ($clan as $member){
+  $members[] = array(
+    'memberType' => $member['memberType'],
+    'displayName' => $member['destinyUserInfo']['displayName'],
+    'membershipId' => $member['destinyUserInfo']['membershipId'],
+  );
+}
+
+var_dump($members);
+*/
