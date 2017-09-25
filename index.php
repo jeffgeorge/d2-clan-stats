@@ -9,7 +9,10 @@ $config = array(
   'client_id' => "",
 );
 
+$hashes = array();
+
 require_once "config.php";
+require_once "hashes.php";
 
 if (empty($_SESSION['access_token']) || time() > $_SESSION['access_token_expiration']){
   //either we don't have a token, or we need to reauth, either way, go auth.
